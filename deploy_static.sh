@@ -1,0 +1,1 @@
+cp -a blog/static .
