@@ -4,9 +4,11 @@
     <div class="post">
         <h2>{{ post.title }}</h2>
         {% if post.published_date %}
-            <div id="date">
-                {{ post.published_date }}
-            </div>
+		<div id="date">
+			{{ post.published_date }}
+		</div>
+	{% else %}
+		<a class="btn btn-default" href="{% url 'post_publish' pk=post.pk %}">Publish</a>
         {% endif %}
 	{% if user.is_authenticated %}
 		<a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
