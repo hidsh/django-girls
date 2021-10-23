@@ -35,7 +35,7 @@ def post_edit(request, pk):
 	return render(request, 'blog/post_edit.html', {'form': form})
 
 def post_publish(request, pk):
-	from django.shortcuts import render, get_object_or_404
+	from django.shortcuts import get_object_or_404
 	from django.shortcuts import redirect
 
 	post = get_object_or_404(Post, pk=pk)
@@ -43,7 +43,7 @@ def post_publish(request, pk):
 	return redirect('post_detail', pk=pk)
 
 def post_remove(request, pk):
-	from django.shortcuts import render, get_object_or_404
+	from django.shortcuts import get_object_or_404
 	from django.shortcuts import redirect
 
 	post = get_object_or_404(Post, pk=pk)
@@ -65,3 +65,43 @@ def post_new(request):
 	else:
 		form = PostForm()
 	return render(request, 'blog/post_edit.html', {'form': form})
+
+def add_comment_to_post(request, pk):
+	from django.shortcuts import render, get_object_or_404
+	from django.shortcuts import redirect
+	from .forms import CommentForm
+
+	post = get_object_or_404(Post, pk=pk)
+	if request.method == "POST":
+		form = CommentForm(request.POST)
+		if form.is_valid():
+			comment = form.save(commit=False)
+			comment.post = post
+			comment.save()
+			return redirect('post_detail', pk=post.pk)
+	else:
+		form = CommentForm()
+	return render(request, 'blog/add_comment_to_post.html', {'form': form})
+
+from django.contrib.auth.decorators import login_required
+from .models import Comment
+
+@login_required
+def comment_approve(request, pk):
+	from django.shortcuts import get_object_or_404
+	from django.shortcuts import redirect
+
+	comment = get_object_or_404(Comment, pk=pk)
+	comment.approve()
+	return redirect('post_detail', pk=comment.post.pk)
+
+@login_required
+def comment_remove(request, pk):
+	from django.shortcuts import get_object_or_404
+	from django.shortcuts import redirect
+
+	comment = get_object_or_404(Comment, pk=pk)
+	comment.delete()
+	return redirect('post_detail', pk=comment.post.pk)
+
+
